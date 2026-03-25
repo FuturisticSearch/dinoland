@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dinoland Server</title>
 
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 50px rgba(0,0,0,0.6);
+    width: 320px;
+}
+
+h1 {
+    margin: 0 0 10px;
+}
+
+.ip {
+    color: #38bdf8;
+    margin-bottom: 15px;
+}
+
+.status {
+    margin: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.online { color: #22c55e; }
+.offline { color: #ef4444; }
+
+.motd {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: pre-line;
+}
+
+button {
+    margin-top: 10px;
+    background: #22c55e;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #16a34a;
+    transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🦖 Dinoland</h1>
+    <div class="ip">dinoland.qzz.io / dinolandbro.falix.gg:21897</div>
+
+    <div id="status" class="status">Checking...</div>
+    <div id="players" class="status"></div>
+    <div id="motd" class="motd"></div>
+
+    <button id="startBtn" onclick="startServer()">Start Server 🚀</button>
+    <button id="bedrockBtn" onclick="addToBedrock()">Add to Bedrock 🎮</button>
+</div>
+
+<script>
+let cooldownActive = false;
+
+function startCooldown() {
+    const btn = document.getElementById("startBtn");
+    btn.disabled = true; // disable button immediately
+    cooldownActive = true;
+    setTimeout(() => {
+        btn.disabled = false; // re-enable after 60 seconds
+        cooldownActive = false;
+    }, 60000); // 60 seconds
+}
+
+async function checkServer() {
+    try {
+        const res = await fetch("https://api.mcstatus.io/v2/status/java/dinolandbro.falix.gg:21897");
+        const data = await res.json();
+
+        const statusEl = document.getElementById("status");
+        const playersEl = document.getElementById("players");
+        const motdEl = document.getElementById("motd");
+        const startBtn = document.getElementById("startBtn");
+
+        // Získáme čistý text MOTD bez HTML
+        const motdText = data.motd.clean || "";
+        motdEl.textContent = motdText;
+
+        // Určení stavu podle obsahu MOTD
+        if (motdText.toLowerCase().includes("online")) {
+            statusEl.innerText = "🟢 Online";
+            statusEl.className = "status online";
+            startBtn.style.display = "none"; // skryj tlačítko start
+        } else if (motdText.toLowerCase().includes("offline")) {
+            statusEl.innerText = "🔴 Offline";
+            statusEl.className = "status offline";
+            startBtn.style.display = "inline-block"; // ukaž tlačítko
+        } else {
+            statusEl.innerText = "⚪ Unknown";
+            statusEl.className = "status";
+            startBtn.style.display = "inline-block"; // ukaž tlačítko
+        }
+
+        // Počet online hráčů
+        if (data.players && typeof data.players.online === "number") {
+            playersEl.innerText = `👥 Players: ${data.players.online} / ${data.players.max}`;
+        } else {
+            playersEl.innerText = "";
+        }
+
+    } catch (err) {
+        const statusEl = document.getElementById("status");
+        const playersEl = document.getElementById("players");
+        const startBtn = document.getElementById("startBtn");
+        statusEl.innerText = "Error ❌";
+        statusEl.className = "status offline";
+        playersEl.innerText = "";
+        document.getElementById("motd").textContent = "";
+        startBtn.style.display = "inline-block"; // ukaž tlačítko pro chybu
+        console.error(err);
+    }
+}
+
+function startServer() {
+    if (cooldownActive) {
+        // Pokud cooldown běží, nedovolíme znovu spustit
+        return;
+    }
+    fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
+    startCooldown(); // zahájit cooldown po kliknutí
+}
+
+// Funkce pro přidání serveru do Bedrocku
+function addToBedrock() {
+    window.location.href = "minecraft://?addExternalServer=dinoland|dinolandbro.falix.gg:21897";
+}
+
+// refresh každých 10s
+checkServer();
+setInterval(checkServer, 10000);
+</script>
+
+</body>
+</html>
