@@ -92,6 +92,7 @@ async function checkServer() {
         const statusEl = document.getElementById("status");
         const playersEl = document.getElementById("players");
         const motdEl = document.getElementById("motd");
+        const startBtn = document.querySelector("button"); // tlačítko Start Server
 
         // Získáme čistý text MOTD bez HTML
         const motdText = data.motd.clean || "";
@@ -101,12 +102,15 @@ async function checkServer() {
         if (motdText.toLowerCase().includes("online")) {
             statusEl.innerText = "🟢 Online";
             statusEl.className = "status online";
+            startBtn.style.display = "none"; // skryj tlačítko
         } else if (motdText.toLowerCase().includes("offline")) {
             statusEl.innerText = "🔴 Offline";
             statusEl.className = "status offline";
+            startBtn.style.display = "inline-block"; // ukaž tlačítko
         } else {
             statusEl.innerText = "⚪ Neznámý stav";
             statusEl.className = "status";
+            startBtn.style.display = "inline-block"; // ukaž tlačítko
         }
 
         // Počet online hráčů
@@ -119,14 +123,15 @@ async function checkServer() {
     } catch (err) {
         const statusEl = document.getElementById("status");
         const playersEl = document.getElementById("players");
+        const startBtn = document.querySelector("button");
         statusEl.innerText = "Error ❌";
         statusEl.className = "status offline";
         playersEl.innerText = "";
         motdEl.textContent = "";
+        startBtn.style.display = "inline-block"; // ukaž tlačítko pro případ chyby
         console.error(err);
     }
 }
-
 function startServer() {
     fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
 }
