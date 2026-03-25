@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinoland Server</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 0 50px rgba(0,0,0,0.6);
+    width: 320px;
+}
+
+h1 {
+    margin: 0 0 10px;
+}
+
+.ip {
+    color: #38bdf8;
+    margin-bottom: 15px;
+}
+
+.status {
+    margin: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.online { color: #22c55e; }
+.offline { color: #ef4444; }
+
+.motd {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: pre-line;
+}
+
+button {
+    margin-top: 20px;
+    background: #22c55e;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #16a34a;
+    transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🦖 Dinoland</h1>
+    <div class="ip">dinoland.qzz.io</div>
+
+    <div id="status" class="status">Checking...</div>
+    <div id="motd" class="motd"></div>
+
+    <button onclick="startServer()">Start Server 🚀</button>
+</div>
+
+<script>
+async function checkServer() {
+    try {
+        const res = await fetch("https://api.mcstatus.io/v2/status/java/dinoland.qzz.io");
+        const data = await res.json();
+
+        const statusEl = document.getElementById("status");
+        const motdEl = document.getElementById("motd");
+
+        // Získáme čistý text MOTD bez HTML
+        const motdText = data.motd.clean || "";
+
+        // Zobrazíme MOTD
+        motdEl.textContent = motdText;
+
+        // Určení stavu podle obsahu MOTD
+        if (motdText.toLowerCase().includes("online")) {
+            statusEl.innerText = "🟢 Online";
+            statusEl.className = "status online";
+        } else if (motdText.toLowerCase().includes("offline")) {
+            statusEl.innerText = "🔴 Offline";
+            statusEl.className = "status offline";
+        } else {
+            statusEl.innerText = "⚪ Neznámý stav";
+            statusEl.className = "status";
+        }
+
+    } catch (err) {
+        const statusEl = document.getElementById("status");
+        statusEl.innerText = "Error ❌";
+        statusEl.className = "status offline";
+        document.getElementById("motd").textContent = "";
+        console.error(err);
+    }
+}
+function startServer() {
+    fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
+}
+
+// refresh každých 10s
+checkServer();
+setInterval(checkServer, 10000);
+</script>
+
+</body>
+</html>
