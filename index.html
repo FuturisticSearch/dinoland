@@ -53,7 +53,7 @@ h1 {
 }
 
 button {
-    margin-top: 20px;
+    margin-top: 10px;
     background: #22c55e;
     border: none;
     padding: 12px 25px;
@@ -80,7 +80,8 @@ button:hover {
     <div id="players" class="status"></div>
     <div id="motd" class="motd"></div>
 
-    <button onclick="startServer()">Start Server 🚀</button>
+    <button id="startBtn" onclick="startServer()">Start Server 🚀</button>
+    <button id="bedrockBtn" onclick="addToBedrock()">Add to Bedrock 🎮</button>
 </div>
 
 <script>
@@ -92,7 +93,7 @@ async function checkServer() {
         const statusEl = document.getElementById("status");
         const playersEl = document.getElementById("players");
         const motdEl = document.getElementById("motd");
-        const startBtn = document.querySelector("button"); // tlačítko Start Server
+        const startBtn = document.getElementById("startBtn");
 
         // Získáme čistý text MOTD bez HTML
         const motdText = data.motd.clean || "";
@@ -102,7 +103,7 @@ async function checkServer() {
         if (motdText.toLowerCase().includes("online")) {
             statusEl.innerText = "🟢 Online";
             statusEl.className = "status online";
-            startBtn.style.display = "none"; // skryj tlačítko
+            startBtn.style.display = "none"; // skryj tlačítko start
         } else if (motdText.toLowerCase().includes("offline")) {
             statusEl.innerText = "🔴 Offline";
             statusEl.className = "status offline";
@@ -123,17 +124,23 @@ async function checkServer() {
     } catch (err) {
         const statusEl = document.getElementById("status");
         const playersEl = document.getElementById("players");
-        const startBtn = document.querySelector("button");
+        const startBtn = document.getElementById("startBtn");
         statusEl.innerText = "Error ❌";
         statusEl.className = "status offline";
         playersEl.innerText = "";
         motdEl.textContent = "";
-        startBtn.style.display = "inline-block"; // ukaž tlačítko pro případ chyby
+        startBtn.style.display = "inline-block"; // ukaž tlačítko pro chybu
         console.error(err);
     }
 }
+
 function startServer() {
     fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
+}
+
+// Funkce pro přidání serveru do Bedrocku
+function addToBedrock() {
+    window.location.href = "minecraft://?addExternalServer=dinolandbro.falix.gg|dinolandbro.falix.gg:21897";
 }
 
 // refresh každých 10s
