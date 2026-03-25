@@ -77,6 +77,7 @@ button:hover {
     <div class="ip">dinoland.qzz.io</div>
 
     <div id="status" class="status">Checking...</div>
+    <div id="players" class="status"></div>
     <div id="motd" class="motd"></div>
 
     <button onclick="startServer()">Start Server 🚀</button>
@@ -85,16 +86,15 @@ button:hover {
 <script>
 async function checkServer() {
     try {
-        const res = await fetch("https://api.mcstatus.io/v2/status/java/dinoland.qzz.io");
+        const res = await fetch("https://api.mcstatus.io/v2/status/java/dinolandbro.falix.gg:21897");
         const data = await res.json();
 
         const statusEl = document.getElementById("status");
+        const playersEl = document.getElementById("players");
         const motdEl = document.getElementById("motd");
 
         // Získáme čistý text MOTD bez HTML
         const motdText = data.motd.clean || "";
-
-        // Zobrazíme MOTD
         motdEl.textContent = motdText;
 
         // Určení stavu podle obsahu MOTD
@@ -109,14 +109,24 @@ async function checkServer() {
             statusEl.className = "status";
         }
 
+        // Počet online hráčů
+        if (data.players && typeof data.players.online === "number") {
+            playersEl.innerText = `👥 Hráči: ${data.players.online} / ${data.players.max}`;
+        } else {
+            playersEl.innerText = "";
+        }
+
     } catch (err) {
         const statusEl = document.getElementById("status");
+        const playersEl = document.getElementById("players");
         statusEl.innerText = "Error ❌";
         statusEl.className = "status offline";
-        document.getElementById("motd").textContent = "";
+        playersEl.innerText = "";
+        motdEl.textContent = "";
         console.error(err);
     }
 }
+
 function startServer() {
     fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
 }
