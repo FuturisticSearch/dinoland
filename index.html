@@ -109,14 +109,14 @@ async function checkServer() {
             statusEl.className = "status offline";
             startBtn.style.display = "inline-block"; // ukaž tlačítko
         } else {
-            statusEl.innerText = "⚪ Neznámý stav";
+            statusEl.innerText = "⚪ Unknown";
             statusEl.className = "status";
             startBtn.style.display = "inline-block"; // ukaž tlačítko
         }
 
         // Počet online hráčů
         if (data.players && typeof data.players.online === "number") {
-            playersEl.innerText = `👥 Hráči: ${data.players.online} / ${data.players.max}`;
+            playersEl.innerText = `👥 Players: ${data.players.online} / ${data.players.max}`;
         } else {
             playersEl.innerText = "";
         }
