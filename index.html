@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dinoland Server</title>
+<title>Dinoland</title>
 
 <style>
 body {
@@ -94,6 +94,7 @@ button:hover {
 </div>
 
 <script>
+let isStarting = false;
 function copyIP(el) {
     const ip = "dinoland.qzz.io";
 
@@ -115,60 +116,59 @@ async function checkServer() {
         const playersEl = document.getElementById("players");
         const motdEl = document.getElementById("motd");
         const startBtn = document.getElementById("startBtn");
-
-        // Získáme čistý text MOTD bez HTML
-        const motdText = data.motd.clean || "";
-        motdEl.textContent = motdText;
-
-        // Určení stavu podle obsahu MOTD
-        if (motdText.toLowerCase().includes("online")) {
+        const motdText = (data.motd.clean || "").toLowerCase();
+        const isJoinable =
+            data.players &&
+            data.players.max > 0 &&
+        motdText.includes("online");
+        if (isStarting && !isJoinable) {
+            statusEl.innerText = "🟡 Starting...";
+            statusEl.className = "status";
+            startBtn.style.display = "none";
+        } else if (isJoinable) {
+            isStarting = false; 
             statusEl.innerText = "🟢 Online";
             statusEl.className = "status online";
-            startBtn.style.display = "none"; // skryj tlačítko start
-        } else if (motdText.toLowerCase().includes("offline")) {
+            startBtn.style.display = "none";
+        } else {
             statusEl.innerText = "🔴 Offline";
             statusEl.className = "status offline";
-            startBtn.style.display = "inline-block"; // ukaž tlačítko
-        } else {
-            statusEl.innerText = "⚪ Unknown";
-            statusEl.className = "status";
-            startBtn.style.display = "inline-block"; // ukaž tlačítko
+            startBtn.style.display = "inline-block";
         }
-
-        // Počet online hráčů
         if (data.players && typeof data.players.online === "number") {
             playersEl.innerText = `👥 Players: ${data.players.online} / ${data.players.max}`;
         } else {
             playersEl.innerText = "";
         }
-
-    } catch (err) {
+    } 
+    catch (err) {
         const statusEl = document.getElementById("status");
         const playersEl = document.getElementById("players");
         const startBtn = document.getElementById("startBtn");
+        const motdEl = document.getElementById("motd");
         statusEl.innerText = "Error ❌";
         statusEl.className = "status offline";
         playersEl.innerText = "";
         motdEl.textContent = "";
-        startBtn.style.display = "inline-block"; // ukaž tlačítko pro chybu
+        startBtn.style.display = "inline-block";
         console.error(err);
     }
 }
 
 function startServer() {
     const btn = document.getElementById("startBtn");
-    btn.disabled = true;
-    btn.innerText = "Starting... ⏳";
-
+    isStarting = true;
+    setTimeout(() => {
+        isStarting = false;
+    }, 120000);
+    btn.style.display = "none";
+    document.getElementById("status").innerText = "🟡 Starting...";
+    document.getElementById("status").className = "status";
     fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
 }
-
-// Funkce pro přidání serveru do Bedrocku
 function addToBedrock() {
     window.location.href = "minecraft://?addExternalServer=dinoland|dinolandbro.falix.gg:21897";
 }
-
-// refresh každých 10s
 checkServer();
 setInterval(checkServer, 10000);
 </script>
