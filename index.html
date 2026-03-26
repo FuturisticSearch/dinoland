@@ -34,6 +34,13 @@ h1 {
 .ip {
     color: #38bdf8;
     margin-bottom: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.ip:hover {
+    color: #0ea5e9;
+    text-decoration: underline;
 }
 
 .status {
@@ -74,7 +81,9 @@ button:hover {
 
 <div class="card">
     <h1>🦖 Dinoland</h1>
-    <div class="ip">dinoland.qzz.io / dinolandbro.falix.gg:21897</div>
+    <div class="ip" onclick="copyIP(this)">
+      IP: dinoland.qzz.io
+    </div>
 
     <div id="status" class="status">Checking...</div>
     <div id="players" class="status"></div>
@@ -85,6 +94,18 @@ button:hover {
 </div>
 
 <script>
+function copyIP(el) {
+    const ip = "dinoland.qzz.io";
+
+    navigator.clipboard.writeText(ip);
+
+    const original = el.innerText;
+    el.innerText = "Copied IP! 📋";
+
+    setTimeout(() => {
+        el.innerText = original;
+    }, 1500);
+}
 async function checkServer() {
     try {
         const res = await fetch("https://api.mcstatus.io/v2/status/java/dinoland.qzz.io");
