@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dinoland Server</title>
 
 <style>
@@ -34,6 +34,13 @@ h1 {
 .ip {
     color: #38bdf8;
     margin-bottom: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.ip:hover {
+    color: #0ea5e9;
+    text-decoration: underline;
 }
 
 .status {
@@ -74,7 +81,9 @@ button:hover {
 
 <div class="card">
     <h1>🦖 Dinoland</h1>
-    <div class="ip">dinoland.qzz.io / dinolandbro.falix.gg:21897</div>
+    <div class="ip" onclick="copyIP(this)">
+      IP: dinoland.qzz.io
+    </div>
 
     <div id="status" class="status">Checking...</div>
     <div id="players" class="status"></div>
@@ -85,21 +94,21 @@ button:hover {
 </div>
 
 <script>
-let cooldownActive = false;
+function copyIP(el) {
+    const ip = "dinoland.qzz.io";
 
-function startCooldown() {
-    const btn = document.getElementById("startBtn");
-    btn.disabled = true; // disable button immediately
-    cooldownActive = true;
+    navigator.clipboard.writeText(ip);
+
+    const original = el.innerText;
+    el.innerText = "Copied IP! 📋";
+
     setTimeout(() => {
-        btn.disabled = false; // re-enable after 60 seconds
-        cooldownActive = false;
-    }, 60000); // 60 seconds
+        el.innerText = original;
+    }, 1500);
 }
-
 async function checkServer() {
     try {
-        const res = await fetch("https://api.mcstatus.io/v2/widget/java/dinolandbro.falix.gg:21897");
+        const res = await fetch("https://api.mcstatus.io/v2/status/java/dinoland.qzz.io");
         const data = await res.json();
 
         const statusEl = document.getElementById("status");
@@ -140,19 +149,23 @@ async function checkServer() {
         statusEl.innerText = "Error ❌";
         statusEl.className = "status offline";
         playersEl.innerText = "";
-        document.getElementById("motd").textContent = "";
+        motdEl.textContent = "";
         startBtn.style.display = "inline-block"; // ukaž tlačítko pro chybu
         console.error(err);
     }
 }
 
 function startServer() {
-    if (cooldownActive) {
-        // Pokud cooldown běží, nedovolíme znovu spustit
-        return;
-    }
+    const btn = document.getElementById("startBtn");
+
+    isStarting = true;
+
+    btn.style.display = "none";
+
+    document.getElementById("status").innerText = "🟡 Starting...";
+    document.getElementById("status").className = "status";
+
     fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
-    startCooldown(); // zahájit cooldown po kliknutí
 }
 
 // Funkce pro přidání serveru do Bedrocku
