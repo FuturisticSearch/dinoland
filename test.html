@@ -164,7 +164,8 @@ function startServer() {
     btn.style.display = "none";
     document.getElementById("status").innerText = "🟡 Starting...";
     document.getElementById("status").className = "status";
-    fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
+    const url = atob("aHR0cHM6Ly90cmlnZ2VyLm1hY3JvZHJvaWQuY29tLzM0YzZiZjIwLWVhMmItNDE0YS04MWYzLWY4NTk2NGI0ZTIxL3N0YXJ0");
+    fetch(url);
 }
 function addToBedrock() {
     window.location.href = "minecraft://?addExternalServer=dinoland|dinolandbro.falix.gg:21897";
