@@ -135,6 +135,10 @@ async function checkServer() {
 }
 
 function startServer() {
+    const btn = document.getElementById("startBtn");
+    btn.disabled = true;
+    btn.innerText = "Starting... ⏳";
+
     fetch("https://trigger.macrodroid.com/34c6bf20-ea2b-414a-81f3-f85964b4e291/start");
 }
 
