@@ -99,7 +99,7 @@ function startCooldown() {
 
 async function checkServer() {
     try {
-        const res = await fetch("https://api.mcstatus.io/v2/status/java/dinolandbro.falix.gg:21897");
+        const res = await fetch("https://api.mcstatus.io/v2/widget/java/dinolandbro.falix.gg:21897");
         const data = await res.json();
 
         const statusEl = document.getElementById("status");
