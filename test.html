@@ -94,6 +94,7 @@ button:hover {
 </div>
 
 <script>
+let isStarting = false;
 function copyIP(el) {
     const ip = "dinoland.qzz.io";
 
@@ -117,40 +118,49 @@ async function checkServer() {
         const startBtn = document.getElementById("startBtn");
 
         // Získáme čistý text MOTD bez HTML
-        const motdText = data.motd.clean || "";
-        motdEl.textContent = motdText;
+        const motdText = (data.motd.clean || "").toLowerCase();
 
-        // Určení stavu podle obsahu MOTD
-        if (motdText.toLowerCase().includes("online")) {
+        // detect real online
+        const isJoinable =
+            data.players &&
+            data.players.max > 0 &&
+        motdText.includes("online");
+
+        // 🔥 OVERRIDE LOGIC
+        if (isStarting && !isJoinable) {
+            statusEl.innerText = "🟡 Starting...";
+            statusEl.className = "status";
+            startBtn.style.display = "none";
+        } else if (isJoinable) {
+            isStarting = false; // reset flag
+
             statusEl.innerText = "🟢 Online";
             statusEl.className = "status online";
-            startBtn.style.display = "none"; // skryj tlačítko start
-        } else if (motdText.toLowerCase().includes("offline")) {
+            startBtn.style.display = "none";
+        } else {
             statusEl.innerText = "🔴 Offline";
             statusEl.className = "status offline";
-            startBtn.style.display = "inline-block"; // ukaž tlačítko
-        } else {
-            statusEl.innerText = "⚪ Unknown";
-            statusEl.className = "status";
-            startBtn.style.display = "inline-block"; // ukaž tlačítko
+            startBtn.style.display = "inline-block";
         }
-
         // Počet online hráčů
         if (data.players && typeof data.players.online === "number") {
             playersEl.innerText = `👥 Players: ${data.players.online} / ${data.players.max}`;
         } else {
             playersEl.innerText = "";
         }
-
-    } catch (err) {
+    } 
+    catch (err) {
         const statusEl = document.getElementById("status");
         const playersEl = document.getElementById("players");
         const startBtn = document.getElementById("startBtn");
+        const motdEl = document.getElementById("motd");
+
         statusEl.innerText = "Error ❌";
         statusEl.className = "status offline";
         playersEl.innerText = "";
         motdEl.textContent = "";
-        startBtn.style.display = "inline-block"; // ukaž tlačítko pro chybu
+        startBtn.style.display = "inline-block";
+
         console.error(err);
     }
 }
@@ -159,6 +169,9 @@ function startServer() {
     const btn = document.getElementById("startBtn");
 
     isStarting = true;
+    setTimeout(() => {
+        isStarting = false;
+    }, 60000);
 
     btn.style.display = "none";
 
